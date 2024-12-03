@@ -12,5 +12,4 @@ with open('input.txt') as file:
         global on
         return (on := inst == 'do') and False if not (m := inst.startswith('mul')) else on and m
 
-
     print('Part 2:', sum([int(a) * int(b) for inst, a, b in re.findall(r"(don't|do|mul\((\d+),(\d+)\))", lines) if flip(inst)]))
