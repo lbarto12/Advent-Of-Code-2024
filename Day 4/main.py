@@ -1,5 +1,4 @@
 from typing import List
-import re
 
 def count_xmas(board: List[str]) -> int:
     return sum([line.count('XMAS') + line.count('SAMX') for line in board])
