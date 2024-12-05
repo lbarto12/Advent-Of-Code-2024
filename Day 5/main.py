@@ -1,63 +1,33 @@
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
-import itertools
+def is_report_valid(rules: Dict[int, List[int]], report: List[int]) -> bool:
+    return not any(not all(report.index(rule) > index for rule in rules[page] if rule in report) for index, page in enumerate(report) if page in rules)
 
-def is_report_valid(rules: Dict[int, List[int]], report: Dict[int, int]) -> bool:
-    valid = True
-    for page, index in report.items():
-        if page not in rules:
+def count_valid(rules: Dict[int, List[int]], reports: List[List[int]]) -> int:
+    return sum(report[len(report) // 2] for report in reports if is_report_valid(rules, report))
+
+def fix(report: List[int], rules: Dict[int, List[int]]) -> List[int]:
+    n, p = len(report), 0
+    while p < n:
+        m = p
+        _ = [m := k for k in range(p, n) if report[k] in rules and report[p] in rules[report[k]]]   # ;)
+        if p != m:
+            report = report[:p] + report[p + 1:m + 1] + [report[p]] + report[m + 1:]
             continue
-        for rule in rules[page]:
-            if rule not in report:
-                continue
-            if report[rule] < index:
-                valid = False
-                break
-        if not valid:
-            break
-    return valid
+        p += 1
+    return report
 
-
-def count_valid(rules: Dict[int, List[int]], reports: List[Dict[int, int]]) -> int:
-    sm = 0
-    for report in reports:
-        if is_report_valid(rules, report):
-            sm += list(report.keys())[len(report) // 2]
-    return sm
-
-def fix(report: Dict[int, int], rules: Dict[int, List[int]]) -> List[int]:
-    n = list(report.keys())
-    j = 0
-    while j < len(n):
-        m = j
-        for k in range(j, len(n)):
-            if n[k] in rules and n[j] in rules[n[k]]:
-                m = k
-        if j != m:
-            n = n[:j] + n[j + 1:m + 1] + [n[j]] + n[m + 1:]
-        if j == m:
-            j += 1
-    return n
-
-def count_and_fix(rules: Dict[int, List[int]], reports: List[Dict[int, int]]) -> int:
-    sm = 0
-    for i, report in enumerate(reports):
-        if is_report_valid(rules, report):
-            continue
-        else:
-            sm += list(n := fix(report, rules))[len(n) // 2]
-    return sm
+def count_and_fix(rules: Dict[int, List[int]], reports: List[List[int]]) -> int:
+    return sum(list(n := fix(report, rules))[len(n) // 2] for report in reports if not is_report_valid(rules, report))
 
 
 with open('input.txt') as file:
-    lines = file.readlines()
-    rules, reports = lines[:(i := lines.index('\n'))], lines[i + 1:]
-    _rules = [(int((s := i.split('|'))[0]), int(s[1])) for i in rules]
-    rules = {}
-    for k, a in _rules:
-        rules.setdefault(k, []).append(a)
-    reports = [[int(i) for i in j.split(',')] for j in reports]
-    reports = [{k: i for i, k in enumerate(j)} for j in reports]
+    lines: List[str] = file.readlines()
+    r_rules, reports = lines[:(i := lines.index('\n'))], [[int(i) for i in j.split(',')] for j in lines[i + 1:]]
+    t_rules: List[Tuple[int, int]] = [(int((s := i.split('|'))[0]), int(s[1])) for i in r_rules]
+    rules: Dict[int, List[int]] = {}
+    for r, a in t_rules:
+        rules.setdefault(r, []).append(a)
 
     print(f'Part 1: {count_valid(rules, reports)}')
 
