@@ -31,11 +31,9 @@ def generate_anti_node_array(nodes: List[Coord], dim: Vector) -> Set[Coord]:
     for i, a in enumerate(nodes):
         for b in nodes[i + 1:]:
             delta: Vector = (a[0] - b[0], a[1] - b[1])
-            for factor in range(1, max([abs(dim[0]), abs(dim[1])])):
+            for factor in range(max([abs(dim[0]), abs(dim[1])])):
                 anodes.add(add_t(a, scalar_t(factor, delta)))
                 anodes.add(add_t(b, scalar_t(factor, (-delta[0], -delta[1]))))
-            anodes.add(a)
-            anodes.add(b)
     return set(filter(lambda c: 0 <= c[0] < dim[0] and 0 <= c[1] < dim[1], anodes))
 
 
