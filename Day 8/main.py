@@ -16,22 +16,12 @@ def link_antennae(board: List[str]) -> List[List[Coord]]:
                 result.setdefault(cell, []).append((j, i))
     return list(result.values())
 
-
-def generate_anti_nodes(nodes: List[Coord], dim: Vector) -> Set[Coord]:
+def generate_anti_nodes(nodes: List[Coord], dim: Vector, base: int = 1, extend: int = 2) -> Set[Coord]:
     anodes: Set[Coord] = set()
     for i, a in enumerate(nodes):
         for b in nodes[i + 1:]:
             delta: Vector = (a[0] - b[0], a[1] - b[1])
-            anodes.add(add_t(a, delta))
-            anodes.add(add_t(b, (-delta[0], -delta[1])))
-    return set(filter(lambda c: 0 <= c[0] < dim[0] and 0 <= c[1] < dim[1], anodes))
-
-def generate_anti_node_array(nodes: List[Coord], dim: Vector) -> Set[Coord]:
-    anodes: Set[Coord] = set()
-    for i, a in enumerate(nodes):
-        for b in nodes[i + 1:]:
-            delta: Vector = (a[0] - b[0], a[1] - b[1])
-            for factor in range(max([abs(dim[0]), abs(dim[1])])):
+            for factor in range(base, extend):
                 anodes.add(add_t(a, scalar_t(factor, delta)))
                 anodes.add(add_t(b, scalar_t(factor, (-delta[0], -delta[1]))))
     return set(filter(lambda c: 0 <= c[0] < dim[0] and 0 <= c[1] < dim[1], anodes))
@@ -49,5 +39,5 @@ with open('input.txt') as file:
 
     anti_nodes = set()
     for antenna in antennae:
-        anti_nodes = anti_nodes.union(generate_anti_node_array(antenna, (m, n)))
+        anti_nodes = anti_nodes.union(generate_anti_nodes(antenna, (m, n), 0, max(m, n)))
     print(f'Part 2: {len(anti_nodes)}')
