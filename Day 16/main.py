@@ -58,6 +58,6 @@ def find_min_path(maze: List[str]) -> Tuple[int, int]:
 with open('input.txt') as file:
     board: List[str] = [i.strip() for i in file.readlines()]
 
-    print('Part 1: {}\nPart 2: {}'.format(*find_min_path(board)))
+    print('Part 1: %d\nPart 2: %d' % find_min_path(board))
 
 
